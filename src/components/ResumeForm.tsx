@@ -8,6 +8,9 @@ import { ProjectsForm } from "./form-sections/ProjectsForm"
 import { Upload, Sparkles } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import type { ResumeData } from "@/types/resume"
+import { GoogleGenerativeAI } from "@google/generative-ai"
+import  config  from "@/config/config"
+import { useEffect } from "react"
 
 interface ResumeFormProps {
   resumeData: ResumeData
@@ -15,6 +18,10 @@ interface ResumeFormProps {
 }
 
 export const ResumeForm = ({ resumeData, onUpdateResumeData }: ResumeFormProps) => {
+
+  const genAI = new GoogleGenerativeAI(config.geminiApiKey)
+  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" })
+
   return (
     <Card className="p-6 shadow-medium bg-card/80 backdrop-blur-sm">
       <div className="mb-6">
@@ -46,35 +53,35 @@ export const ResumeForm = ({ resumeData, onUpdateResumeData }: ResumeFormProps) 
         </TabsList>
 
         <TabsContent value="personal" className="space-y-4">
-          <PersonalInfoForm 
+          <PersonalInfoForm
             data={resumeData.personal}
             onUpdate={(personal) => onUpdateResumeData({ ...resumeData, personal })}
           />
         </TabsContent>
 
         <TabsContent value="education" className="space-y-4">
-          <EducationForm 
+          <EducationForm
             education={resumeData.education}
             onUpdate={(education) => onUpdateResumeData({ ...resumeData, education })}
           />
         </TabsContent>
 
         <TabsContent value="experience" className="space-y-4">
-          <ExperienceForm 
+          <ExperienceForm
             experience={resumeData.experience}
             onUpdate={(experience) => onUpdateResumeData({ ...resumeData, experience })}
           />
         </TabsContent>
 
         <TabsContent value="skills" className="space-y-4">
-          <SkillsForm 
+          <SkillsForm
             skills={resumeData.skills}
             onUpdate={(skills) => onUpdateResumeData({ ...resumeData, skills })}
           />
         </TabsContent>
 
         <TabsContent value="projects" className="space-y-4">
-          <ProjectsForm 
+          <ProjectsForm
             projects={resumeData.projects}
             onUpdate={(projects) => onUpdateResumeData({ ...resumeData, projects })}
           />
