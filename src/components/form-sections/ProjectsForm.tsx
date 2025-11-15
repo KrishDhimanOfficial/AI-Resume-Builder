@@ -6,6 +6,7 @@ import { Plus, Trash2 } from "lucide-react"
 import type { Project } from "@/types/resume"
 import useCorrectWithAi from "@/hooks/useCorrectWithAi"
 import GenerativeAIButton from "../GenerativeAIButton"
+import { useState } from "react"
 
 interface ProjectsFormProps {
     projects: Project[]
@@ -14,6 +15,7 @@ interface ProjectsFormProps {
 
 export const ProjectsForm = ({ projects, onUpdate }: ProjectsFormProps) => {
     const { GenerateWithAI } = useCorrectWithAi()
+    const [isGenerating, setIsGenerating] = useState(false)
 
     const addProject = () => {
         onUpdate([
@@ -42,6 +44,7 @@ export const ProjectsForm = ({ projects, onUpdate }: ProjectsFormProps) => {
 
     const handleGenerateWithAI = async (id: string) => {
         try {
+            setIsGenerating(true)
             const data = projects.find((pro) => pro.id === id)
             const description = await GenerateWithAI(data.description)
             onUpdate(
@@ -49,8 +52,10 @@ export const ProjectsForm = ({ projects, onUpdate }: ProjectsFormProps) => {
                     pro.id === id ? { ...pro, description } : pro
                 )
             )
+            setIsGenerating(false)
         } catch (error) {
             console.error("AI Correction Error:", error)
+            setIsGenerating(false)
         }
     }
 
@@ -82,7 +87,10 @@ export const ProjectsForm = ({ projects, onUpdate }: ProjectsFormProps) => {
                     <div>
                         <div className="flex align-center justify-between mb-3">
                             <Label>Description</Label>
-                            <GenerativeAIButton onclick={() => handleGenerateWithAI(project.id)} />
+                            <GenerativeAIButton
+                                onclick={() => handleGenerateWithAI(project.id)}
+                                isGenerating={isGenerating}
+                            />
                         </div>
                         <Textarea
                             value={project.description}

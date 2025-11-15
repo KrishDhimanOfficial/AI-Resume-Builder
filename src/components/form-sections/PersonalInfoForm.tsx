@@ -4,6 +4,7 @@ import { Textarea } from "@/components/ui/textarea"
 import type { PersonalInfo } from "@/types/resume"
 import GenerativeAIButton from "../GenerativeAIButton"
 import useCorrectWithAi from "@/hooks/useCorrectWithAi"
+import { useState } from "react"
 
 interface PersonalInfoFormProps {
     data: PersonalInfo
@@ -12,16 +13,20 @@ interface PersonalInfoFormProps {
 
 export const PersonalInfoForm = ({ data, onUpdate }: PersonalInfoFormProps) => {
     const { GenerateWithAI } = useCorrectWithAi()
+    const [isGenerating, setIsGenerating] = useState(false)
 
     const handleGenerateWithAI = async () => {
         try {
+            setIsGenerating(true)
             const summary = await GenerateWithAI(data.summary)
             onUpdate({ ...data, summary: summary })
+            setIsGenerating(false)
         } catch (error) {
             console.error("AI Correction Error:", error)
+            setIsGenerating(false)
         }
     }
-    
+
     return (
         <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
@@ -80,7 +85,10 @@ export const PersonalInfoForm = ({ data, onUpdate }: PersonalInfoFormProps) => {
             <div>
                 <div className="flex align-center justify-between mb-3">
                     <Label htmlFor="summary">Professional Summary</Label>
-                    <GenerativeAIButton onclick={() => handleGenerateWithAI()} />
+                    <GenerativeAIButton
+                        onclick={() => handleGenerateWithAI()}
+                        isGenerating={isGenerating}
+                    />
                 </div>
                 <Textarea
                     id="summary"

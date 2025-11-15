@@ -7,6 +7,7 @@ import { Plus, Trash2 } from "lucide-react"
 import type { Experience } from "@/types/resume"
 import useCorrectWithAi from "@/hooks/useCorrectWithAi"
 import GenerativeAIButton from "../GenerativeAIButton"
+import { useState } from "react"
 
 interface ExperienceFormProps {
     experience: Experience[]
@@ -15,6 +16,8 @@ interface ExperienceFormProps {
 
 export const ExperienceForm = ({ experience, onUpdate }: ExperienceFormProps) => {
     const { GenerateWithAI } = useCorrectWithAi()
+    const [isGenerating, setIsGenerating] = useState(false)
+
     const addExperience = () => {
         onUpdate([
             ...experience,
@@ -42,9 +45,10 @@ export const ExperienceForm = ({ experience, onUpdate }: ExperienceFormProps) =>
             )
         )
     }
-    
+
     const handleGenerateWithAI = async (id: string) => {
         try {
+            setIsGenerating(true)
             const data = experience.find((exp) => exp.id === id)
             const description = await GenerateWithAI(data.description)
             onUpdate(
@@ -52,8 +56,10 @@ export const ExperienceForm = ({ experience, onUpdate }: ExperienceFormProps) =>
                     exp.id === id ? { ...exp, description } : exp
                 )
             )
+            setIsGenerating(false)
         } catch (error) {
             console.error("AI Correction Error:", error)
+            setIsGenerating(false)
         }
     }
 
@@ -136,7 +142,10 @@ export const ExperienceForm = ({ experience, onUpdate }: ExperienceFormProps) =>
                     <div>
                         <div className="flex align-center justify-between mb-3">
                             <Label>Description</Label>
-                            <GenerativeAIButton onclick={() => handleGenerateWithAI(exp.id)} />
+                            <GenerativeAIButton
+                                onclick={() => handleGenerateWithAI(exp.id)}
+                                isGenerating={isGenerating}
+                            />
                         </div>
                         <Textarea
                             value={exp.description}

@@ -32,10 +32,6 @@ export const ResumePreview = ({ resumeData, template, onTemplateChange }: Resume
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-2xl font-bold">Preview</h2>
           <div className="flex gap-2">
-            <Button variant="outline" size="sm">
-              <Share2 className="w-4 h-4 mr-2" />
-              Share
-            </Button>
             <Button size="sm" className="bg-gradient-accent">
               <Download className="w-4 h-4 mr-2" />
               Download PDF
