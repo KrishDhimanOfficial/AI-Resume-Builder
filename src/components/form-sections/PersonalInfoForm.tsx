@@ -2,6 +2,8 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import type { PersonalInfo } from "@/types/resume"
+import GenerativeAIButton from "../GenerativeAIButton"
+import useCorrectWithAi from "@/hooks/useCorrectWithAi"
 
 interface PersonalInfoFormProps {
     data: PersonalInfo
@@ -9,6 +11,17 @@ interface PersonalInfoFormProps {
 }
 
 export const PersonalInfoForm = ({ data, onUpdate }: PersonalInfoFormProps) => {
+    const { GenerateWithAI } = useCorrectWithAi()
+
+    const handleGenerateWithAI = async () => {
+        try {
+            const summary = await GenerateWithAI(data.summary)
+            onUpdate({ ...data, summary: summary })
+        } catch (error) {
+            console.error("AI Correction Error:", error)
+        }
+    }
+    
     return (
         <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
@@ -65,7 +78,10 @@ export const PersonalInfoForm = ({ data, onUpdate }: PersonalInfoFormProps) => {
             </div>
 
             <div>
-                <Label htmlFor="summary">Professional Summary</Label>
+                <div className="flex align-center justify-between mb-3">
+                    <Label htmlFor="summary">Professional Summary</Label>
+                    <GenerativeAIButton onclick={() => handleGenerateWithAI()} />
+                </div>
                 <Textarea
                     id="summary"
                     value={data.summary}

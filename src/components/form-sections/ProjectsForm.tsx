@@ -4,6 +4,8 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Plus, Trash2 } from "lucide-react"
 import type { Project } from "@/types/resume"
+import useCorrectWithAi from "@/hooks/useCorrectWithAi"
+import GenerativeAIButton from "../GenerativeAIButton"
 
 interface ProjectsFormProps {
     projects: Project[]
@@ -11,6 +13,8 @@ interface ProjectsFormProps {
 }
 
 export const ProjectsForm = ({ projects, onUpdate }: ProjectsFormProps) => {
+    const { GenerateWithAI } = useCorrectWithAi()
+
     const addProject = () => {
         onUpdate([
             ...projects,
@@ -34,6 +38,20 @@ export const ProjectsForm = ({ projects, onUpdate }: ProjectsFormProps) => {
                 project.id === id ? { ...project, [field]: value } : project
             )
         )
+    }
+
+    const handleGenerateWithAI = async (id: string) => {
+        try {
+            const data = projects.find((pro) => pro.id === id)
+            const description = await GenerateWithAI(data.description)
+            onUpdate(
+                projects.map((pro) =>
+                    pro.id === id ? { ...pro, description } : pro
+                )
+            )
+        } catch (error) {
+            console.error("AI Correction Error:", error)
+        }
     }
 
     return (
@@ -62,7 +80,10 @@ export const ProjectsForm = ({ projects, onUpdate }: ProjectsFormProps) => {
                     </div>
 
                     <div>
-                        <Label>Description</Label>
+                        <div className="flex align-center justify-between mb-3">
+                            <Label>Description</Label>
+                            <GenerativeAIButton onclick={() => handleGenerateWithAI(project.id)} />
+                        </div>
                         <Textarea
                             value={project.description}
                             onChange={(e) => updateProject(project.id, "description", e.target.value)}

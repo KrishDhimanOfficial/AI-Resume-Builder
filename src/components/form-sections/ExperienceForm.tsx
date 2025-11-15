@@ -5,6 +5,8 @@ import { Textarea } from "@/components/ui/textarea"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Plus, Trash2 } from "lucide-react"
 import type { Experience } from "@/types/resume"
+import useCorrectWithAi from "@/hooks/useCorrectWithAi"
+import GenerativeAIButton from "../GenerativeAIButton"
 
 interface ExperienceFormProps {
     experience: Experience[]
@@ -12,6 +14,7 @@ interface ExperienceFormProps {
 }
 
 export const ExperienceForm = ({ experience, onUpdate }: ExperienceFormProps) => {
+    const { GenerateWithAI } = useCorrectWithAi()
     const addExperience = () => {
         onUpdate([
             ...experience,
@@ -38,6 +41,20 @@ export const ExperienceForm = ({ experience, onUpdate }: ExperienceFormProps) =>
                 exp.id === id ? { ...exp, [field]: value } : exp
             )
         )
+    }
+    
+    const handleGenerateWithAI = async (id: string) => {
+        try {
+            const data = experience.find((exp) => exp.id === id)
+            const description = await GenerateWithAI(data.description)
+            onUpdate(
+                experience.map((exp) =>
+                    exp.id === id ? { ...exp, description } : exp
+                )
+            )
+        } catch (error) {
+            console.error("AI Correction Error:", error)
+        }
     }
 
     return (
@@ -117,7 +134,10 @@ export const ExperienceForm = ({ experience, onUpdate }: ExperienceFormProps) =>
                     </div>
 
                     <div>
-                        <Label>Description</Label>
+                        <div className="flex align-center justify-between mb-3">
+                            <Label>Description</Label>
+                            <GenerativeAIButton onclick={() => handleGenerateWithAI(exp.id)} />
+                        </div>
                         <Textarea
                             value={exp.description}
                             onChange={(e) => updateExperience(exp.id, "description", e.target.value)}
